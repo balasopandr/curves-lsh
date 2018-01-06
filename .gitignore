@@ -1,0 +1,7 @@
+*.o
+bin/
+bin_tests/
+tags
+vgcore*
+datasets/
+*.swp
