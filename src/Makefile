@@ -1,6 +1,6 @@
 CC= gcc
 CFLAGS= -c -g -Wall
-LDFLAGS=-lm
+LDFLAGS=-lm -llapacke -llapack -lopenblas
 BIN:=../bin
 SRC:=./
 

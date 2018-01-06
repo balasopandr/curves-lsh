@@ -80,3 +80,21 @@ int in_interval(double lower, double upper, double element)
 		return NOT_IN;
 	}
 }
+
+void print_array_col_major(double *array, int row, int col, FILE *stream)
+{
+	int i, j;
+	for(i=0; i<col; i++)
+	{
+		fprintf(stream, "[");
+		for(j=0; j<row; j++)
+		{
+			fprintf(stream, "%10.6f", array[j*row + i]);
+			if(j!=row-1)
+			{
+				fprintf(stream, "\t");
+			}
+		}
+		fprintf(stream, "]\n");
+	}
+}

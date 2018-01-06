@@ -9,6 +9,7 @@ FILE * open_or_die(char *filename, char *mode, char *errmsg);
 int uniform_random_int(int min, int max);
 double max_double_array(double *array, unsigned int num_of_elements, int *arg_max);
 int in_interval(double lower, double upper, double element);
+void print_array_col_major(double *array, int row, int col, FILE *stream);
 
 /* seperates a double into mantisa, exponent and sign parts */
 typedef union
