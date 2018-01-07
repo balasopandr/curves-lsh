@@ -81,19 +81,47 @@ int in_interval(double lower, double upper, double element)
 	}
 }
 
-void print_array_col_major(double *array, int row, int col, FILE *stream)
+double * array_copy(double *array, int size)
 {
+	double *copy = malloc(sizeof(double)*size);
+	for(int i=0; i<size; i++)
+	{
+		copy[i] = array[i];
+	}
+	return copy;
+}
+
+double * array_transpose(double *array, int row, int col)
+{
+	double *transpose = malloc(sizeof(double)*row*col);
 	int i, j;
-	for(i=0; i<col; i++)
+	for(i=0; i<row; i++)
+	{
+		for(j=0; j<col; j++)
+		{
+			transpose[i*col + j] = array[j*row +i];
+		}
+	}
+	return transpose;
+}
+
+void array_print(double *array, int row, int col, int major, FILE *stream)
+{
+	for(int i=0; i<row; i++)
 	{
 		fprintf(stream, "[");
-		for(j=0; j<row; j++)
+		for(int j=0; j<col; j++)
 		{
-			fprintf(stream, "%10.6f", array[j*row + i]);
-			if(j!=row-1)
+			int u;
+			if(major == COL_MAJOR)
 			{
-				fprintf(stream, "\t");
+				u = j*row + i;
 			}
+			else
+			{
+				u = i*col + j;
+			}
+			fprintf(stream, "%10.6f ", array[u]);
 		}
 		fprintf(stream, "]\n");
 	}
