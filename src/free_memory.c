@@ -52,7 +52,10 @@ void free_curves(Curve *curves, unsigned int number_of_curves, List curves_list)
 	}
 	free(curves);
 	curves = NULL;
-	List_destroy(curves_list, NULL);
+	if(curves_list != NULL)
+	{
+		List_destroy(curves_list, NULL);
+	}
 }
 
 void free_hashes(HashTable *hashes, Params parameters)

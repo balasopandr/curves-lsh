@@ -66,14 +66,21 @@ int LAPACKE_svd(double *array, int rows, int cols, double **U,
 			(*U)[i] = 0.0;
 		}
 	}
-	// array_print(*U, rows, cols, COL_MAJOR, stdout);
 	*S = LAPACKE_malloc(sizeof(double)*cols);
+	for(int i=0; i<cols; i++)
+	{
+		(*S)[i] = 0.0;
+	}
 	*V = LAPACKE_malloc(sizeof(double)*ldv*ldv);
 	for(int i=0; i<ldv*ldv;i++)
 	{
 		(*V)[i] = 0.0;
 	}
 	double *stat = LAPACKE_malloc(sizeof(double)*max(rows+cols, 6));
+	for(int i=0; i<6; i++)
+	{
+		stat[i] = 0.0;
+	}
 
 	info = LAPACKE_dgesvj(LAPACK_COL_MAJOR, 'G', 'U', 'V', rows, cols, *U, ldarray, *S, ldv, *V, ldv, stat);
 

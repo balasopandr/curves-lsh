@@ -1,16 +1,23 @@
 #include <stdlib.h>
+#include <string.h>
 #include "function_caster.h"
 #include "curve.h"
 #include "curve_metrics.h"
+#include "crmsd.h"
 
 unsigned int object_points(void *point)
 {
 	return Curve_get_points_count((Curve) point);
 }
 
-double point_dist(void *P, void *Q, double ***array)
+double crmsd_frechet_dist(void *P, void *Q, double ***array)
 {
-	return Frechet_distance((Curve)P, (Curve) Q, array);
+	return CRMSD_frechet_dist((Curve)P, (Curve) Q, array);
+}
+
+double crmsd_curve_dist(void *P, void *Q, double ***array)
+{
+	return CRMSD_curve_dist((Curve)P, (Curve) Q, array);
 }
 
 bool dists_condition(void *point)
@@ -38,12 +45,19 @@ int get_object_index(void *point)
 	return Curve_get_curve_idx((Curve) point);
 }
 
-FunctionCaster FunctionCaster_init()
+FunctionCaster FunctionCaster_init(Params parameters)
 {
-	
+
 	FunctionCaster function_caster = malloc(sizeof(struct fun_cst));
 	function_caster->object_points = &object_points;
-	function_caster->point_dist = &point_dist;
+	if(strncmp(parameters->metric_name, "DFT", 3) == 0)
+	{
+		function_caster->point_dist = crmsd_frechet_dist;
+	}
+	else if (strncmp(parameters->metric_name, "CRMSD", 5) == 0)
+	{
+		function_caster->point_dist = crmsd_curve_dist;
+	}
 	function_caster->dists_condition = &dists_condition;
 	function_caster->del_mean_curve = &del_mean_curve;
 	function_caster->copy_medoid = &copy_medoid;

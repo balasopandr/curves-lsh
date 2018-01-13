@@ -2,6 +2,7 @@
 #define __CURVE_METRICS__
 #include "curve.h"
 #include "complete_binary_tree.h"
+#include "crmsd.h"
 
 double Euclidean_distance(double *pointA, double *pointB);
 double Frechet_distance(Curve P, Curve Q, double ***distances);

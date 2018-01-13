@@ -45,6 +45,12 @@ bool check_metric_func(double (** metric_func)(Curve, Curve, double ***), char *
 			*metric_func = &Frechet_distance;
 			return true;
 		}
+		else if(strncmp(buf, "CRMSD", 5) ==0 
+				|| strncmp(buf, "cRMSD", 5) ==0)
+		{
+			*metric_name = buf;
+			*metric_func = &CRMSD_curve_dist;
+		}
 		else
 		{
 			exit(EXIT_FAILURE);
@@ -88,135 +94,213 @@ List create_curves_list(Curve *curves, unsigned int number_of_curves)
 	return curves_list;
 }
 
-void run_all_combinations(Params parameters, Curve *curves, List curves_list,
+void execute_clustering(Params parameters, Curve *curves, List curves_list,
 		HashTable *hashes, unsigned int *rand_for_hash, double ***shift_values,
 		double **dists)
 {
 	unsigned int number_of_curves = List_get_length(curves_list);
-	int i,j,k;
-	FunctionCaster function_caster = FunctionCaster_init();
-	for(i=0; i<2; i++)
+	FunctionCaster function_caster = FunctionCaster_init(parameters);
+	printf("***START LOOP***\n");
+	printf("I%dA%dU%d\n", i, j, k);
+	Cluster *clusters = malloc(sizeof(Cluster)*parameters->number_of_clusters);
+	int m;
+	for(m=0; m<parameters->number_of_clusters; m++)
 	{
-		for(j=0; j<2; j++)
+		clusters[m] = Cluster_create(object_points);
+	}
+	KMeans_random_selection(clusters, parameters->number_of_clusters,
+			(void **)(curves), number_of_curves);
+	// KMeans_plus_plus(clusters, parameters->number_of_clusters, (void **) curves,
+	// number_of_curves, dists);
+
+	double min_func = INFINITY; 
+	Cluster *best_clusters = malloc(sizeof(Cluster)*parameters->number_of_clusters);
+	for(m=0; m<parameters->number_of_clusters; m++)
+	{
+		best_clusters[m] = NULL;
+	}
+	double diff = 0.0;
+	int count = 0;
+	do
+	{
+		/* delete previous list of assigned points */
+		for(m=0; m<parameters->number_of_clusters; m++)
 		{
-			for(k=0; k<2; k++)
+			Cluster_delete_points(clusters[m]);
+		}
+		Lloyd_assignment(clusters, (void **) curves, number_of_curves,
+				parameters, dists, free_double_array, function_caster);
+		// LSH_assignment(clusters, (void **) curves, number_of_curves,
+		// parameters, dists, hashes,
+		// rand_for_hash, shift_values,
+		// &free_double_array, function_caster);
+
+		// MeanUpdate(clusters, parameters->number_of_clusters, function_caster->del_mean_curve, dists); 
+
+		double cur_min_func = minimization_function((void **)curves, number_of_curves,
+				clusters, parameters, dists, free_double_array, function_caster);
+		diff = (min_func - cur_min_func);
+		printf("step %d: target: %f diff: %f, min_func: %f\n", count, THRESHOLD, diff, cur_min_func);
+		if(cur_min_func < min_func)
+		{
+			min_func = cur_min_func;
+			for(m=0; m<parameters->number_of_clusters; m++)
 			{
-				if(k==1 ) continue;
-
-				printf("***START LOOP***\n");
-				printf("I%dA%dU%d\n", i, j, k);
-				Cluster *clusters = malloc(sizeof(Cluster)*parameters->number_of_clusters);
-				int m;
-				for(m=0; m<parameters->number_of_clusters; m++)
-				{
-					clusters[m] = Cluster_create(object_points);
-				}
-				if(i==0)
-				{
-					KMeans_random_selection(clusters, parameters->number_of_clusters,
-							(void **)(curves), number_of_curves);
-				}
-				else
-				{
-					KMeans_plus_plus(clusters, parameters->number_of_clusters, (void **) curves,
-							number_of_curves, dists);
-				}
-
-				double min_func = INFINITY; 
-				Cluster *best_clusters = malloc(sizeof(Cluster)*parameters->number_of_clusters);
-				for(m=0; m<parameters->number_of_clusters; m++)
-				{
-					best_clusters[m] = NULL;
-				}
-				double diff = 0.0;
-				int count = 0;
-				do
-				{
-					/* delete previous list of assigned points */
-					for(m=0; m<parameters->number_of_clusters; m++)
-					{
-						Cluster_delete_points(clusters[m]);
-					}
-					if(j==0)
-					{
-						Lloyd_assignment(clusters, (void **) curves, number_of_curves,
-								parameters, dists, free_double_array, function_caster);
-					}
-					else
-					{
-						LSH_assignment(clusters, (void **) curves, number_of_curves,
-								parameters, dists, hashes,
-								rand_for_hash, shift_values,
-								&free_double_array, function_caster);
-					}
-
-					if(k==0)
-					{
-						MeanUpdate(clusters, parameters->number_of_clusters, function_caster->del_mean_curve, dists); 
-					}
-					else
-					{
-						/* not implemented */
-						printf("PAM not implemented\n");
-					}
-
-					double cur_min_func = minimization_function((void **)curves, number_of_curves,
-							clusters, parameters, dists, free_double_array, function_caster);
-					diff = (min_func - cur_min_func);
-					printf("step %d: target: %f diff: %f, min_func: %f\n", count, THRESHOLD, diff, cur_min_func);
-					if(cur_min_func < min_func)
-					{
-						min_func = cur_min_func;
-						for(m=0; m<parameters->number_of_clusters; m++)
-						{
-							best_clusters[m] = Cluster_copy(clusters[m], function_caster->copy_medoid);
-						}
-					}
-					count++;
-				}while(diff >= THRESHOLD && count <= MAX_ITERATIONS);
-
-				/* calculate silhouette */
-				double *silhouette_cluster;
-				double silhouette_average = calculate_silhouette(clusters, parameters,
-						&silhouette_cluster, dists, free_double_array, function_caster);
-
-				/* print output */
-				print_output(best_clusters, parameters, silhouette_cluster, 
-						silhouette_average, i, j, k);
-				free_clusters(clusters, parameters);
-				free_clusters(best_clusters, parameters);
-				free(silhouette_cluster);
-				silhouette_cluster = NULL;
-				printf("***END LOOP***\n");
+				best_clusters[m] = Cluster_copy(clusters[m], function_caster->copy_medoid);
 			}
 		}
-	}
+		count++;
+	}while(diff >= THRESHOLD && count <= MAX_ITERATIONS);
+
+	/* calculate silhouette */
+	double *silhouette_cluster;
+	double silhouette_average = calculate_silhouette(clusters, parameters,
+			&silhouette_cluster, dists, free_double_array, function_caster);
+
+	/* print output */
+	print_output(best_clusters, parameters, silhouette_cluster, 
+			silhouette_average, i, j, k);
+	free_clusters(clusters, parameters);
+	free_clusters(best_clusters, parameters);
+	free(silhouette_cluster);
+	silhouette_cluster = NULL;
+	printf("***END LOOP***\n");
 	FunctionCaster_delete(function_caster);
 }
 
-double ** calculate_all_frechet_dists(Curve *curves, unsigned int num_of_curves)
+// void run_all_combinations(Params parameters, Curve *curves, List curves_list,
+// HashTable *hashes, unsigned int *rand_for_hash, double ***shift_values,
+// double **dists)
+// {
+// unsigned int number_of_curves = List_get_length(curves_list);
+// int i,j,k;
+// FunctionCaster function_caster = FunctionCaster_init(parameters);
+// for(i=0; i<2; i++)
+// {
+// for(j=0; j<2; j++)
+// {
+// for(k=0; k<2; k++)
+// {
+// if(k==1 ) continue;
+// 
+// printf("***START LOOP***\n");
+// printf("I%dA%dU%d\n", i, j, k);
+// Cluster *clusters = malloc(sizeof(Cluster)*parameters->number_of_clusters);
+// int m;
+// for(m=0; m<parameters->number_of_clusters; m++)
+// {
+// clusters[m] = Cluster_create(object_points);
+// }
+// if(i==0)
+// {
+// KMeans_random_selection(clusters, parameters->number_of_clusters,
+// (void **)(curves), number_of_curves);
+// }
+// else
+// {
+// KMeans_plus_plus(clusters, parameters->number_of_clusters, (void **) curves,
+// number_of_curves, dists);
+// }
+// 
+// double min_func = INFINITY; 
+// Cluster *best_clusters = malloc(sizeof(Cluster)*parameters->number_of_clusters);
+// for(m=0; m<parameters->number_of_clusters; m++)
+// {
+// best_clusters[m] = NULL;
+// }
+// double diff = 0.0;
+// int count = 0;
+// do
+// {
+// /* delete previous list of assigned points */
+// for(m=0; m<parameters->number_of_clusters; m++)
+// {
+// Cluster_delete_points(clusters[m]);
+// }
+// if(j==0)
+// {
+// Lloyd_assignment(clusters, (void **) curves, number_of_curves,
+// parameters, dists, free_double_array, function_caster);
+// }
+// else
+// {
+// LSH_assignment(clusters, (void **) curves, number_of_curves,
+// parameters, dists, hashes,
+// rand_for_hash, shift_values,
+// &free_double_array, function_caster);
+// }
+// 
+// if(k==0)
+// {
+// MeanUpdate(clusters, parameters->number_of_clusters, function_caster->del_mean_curve, dists); 
+// }
+// else
+// {
+// /* not implemented */
+// printf("PAM not implemented\n");
+// }
+// 
+// double cur_min_func = minimization_function((void **)curves, number_of_curves,
+// clusters, parameters, dists, free_double_array, function_caster);
+// diff = (min_func - cur_min_func);
+// printf("step %d: target: %f diff: %f, min_func: %f\n", count, THRESHOLD, diff, cur_min_func);
+// if(cur_min_func < min_func)
+// {
+// min_func = cur_min_func;
+// for(m=0; m<parameters->number_of_clusters; m++)
+// {
+// best_clusters[m] = Cluster_copy(clusters[m], function_caster->copy_medoid);
+// }
+// }
+// count++;
+// }while(diff >= THRESHOLD && count <= MAX_ITERATIONS);
+// 
+// /* calculate silhouette */
+// double *silhouette_cluster;
+// double silhouette_average = calculate_silhouette(clusters, parameters,
+// &silhouette_cluster, dists, free_double_array, function_caster);
+// 
+// /* print output */
+// print_output(best_clusters, parameters, silhouette_cluster, 
+// silhouette_average, i, j, k);
+// free_clusters(clusters, parameters);
+// free_clusters(best_clusters, parameters);
+// free(silhouette_cluster);
+// silhouette_cluster = NULL;
+// printf("***END LOOP***\n");
+// }
+// }
+// }
+// FunctionCaster_delete(function_caster);
+// }
+
+double ** calculate_all_dists(Curve *curves, unsigned int num_of_curves, double (*dist_func)(Curve, Curve, double ***))
 {
-	double **frechet_dists = malloc(sizeof(double *)*num_of_curves);
+	double **dists = malloc(sizeof(double *)*num_of_curves);
 	int i;
 	for(i=0; i<num_of_curves; i++)
 	{
-		frechet_dists[i] = malloc(sizeof(double)*num_of_curves);
+		printf("calculating dist for curve %d\n", i);
+		dists[i] = malloc(sizeof(double)*num_of_curves);
 		int j;
 		for(j=0; j<i+1; j++)
 		{
-			double **dists;
-			double dist = Frechet_distance(curves[i], curves[j], &dists);
-			frechet_dists[i][j] = dist;
-			frechet_dists[j][i] = dist;
+			double **dists = NULL;
+			double dist = dist_func(curves[i], curves[j], &dists);
+			dists[i][j] = dist;
+			dists[j][i] = dist;
 			int k;
-			for(k=0; k<Curve_get_points_count(curves[i]); k++)
+			if(dists != NULL)
 			{
-				free(dists[k]);
-				dists[k] = NULL;
+				for(k=0; k<Curve_get_points_count(curves[i]); k++)
+				{
+					free(dists[k]);
+					dists[k] = NULL;
+				}
+				free(dists);
+				dists = NULL;
 			}
-			free(dists);
-			dists = NULL;
 		}
 	}
-	return frechet_dists;
+	return dists;
 }

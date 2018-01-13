@@ -10,7 +10,7 @@
 #include "main_functions.h"
 
 extern unsigned int dimension;
-#define ELEMENTS_PER_BUCKET 25
+#define ELEMENTS_PER_BUCKET 90
 
 HashTable * build_hashes(List curve_list, Params parameters, unsigned int *rand_for_hash, double ***shift_values)
 {

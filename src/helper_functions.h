@@ -12,6 +12,8 @@ int in_interval(double lower, double upper, double element);
 double * array_copy(double *array, int size);
 double * array_transpose(double *array, int row, int col);
 void array_print(double *array, int row, int col, int major, FILE *stream);
+void array_addition(double *arr1, double *arr2, int size, int a, int b);
+double * convert_matrix(double **matrix, int rows, int cols);
 
 /* seperates a double into mantisa, exponent and sign parts */
 typedef union

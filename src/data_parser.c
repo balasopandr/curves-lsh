@@ -32,7 +32,7 @@ unsigned int read_curve_count(FILE *dataset)
 	return number_of_curves;
 }
 /* reads a curve from the dataset */
-Curve parse_dataset_line(char *line, size_t len, ssize_t read, int *max_curve_points, int curve_idx)
+Curve parse_curve_dataset_line(char *line, size_t len, ssize_t read, int *max_curve_points, int curve_idx)
 {
 	char *str_id = NULL;
 	char *str_point_count = NULL;
@@ -127,7 +127,7 @@ Curve * read_curves(FILE *dataset, unsigned int number_of_curves, int *max_curve
 			continue;
 		}
 		Curve curve;
-		curve = parse_dataset_line(line, len, read, max_curve_points, i);
+		curve = parse_curve_dataset_line(line, len, read, max_curve_points, i);
 		curves[i] = curve;
 		i++;
 	}
@@ -173,4 +173,46 @@ void parse_config_file(FILE *config, Params parameters)
 	line = NULL;
 	fclose(config);
 	config = NULL;
+}
+
+/* reads the input dataset */
+Curve* read_conformations(FILE *dataset, unsigned int *number_of_conformations)
+{
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t read;
+
+	read = getline(&line, &len, dataset);
+	*number_of_conformations = atoi(line);
+	read = getline(&line, &len, dataset);
+	unsigned int conformation_points = atoi(line);
+
+	Curve *conformations = malloc(sizeof(Curve)*(*number_of_conformations));
+	for(int i=0; i<*number_of_conformations; i++)
+	{
+		double **vector = NULL;
+		vector = malloc(sizeof(double *)*conformation_points);
+		for(int j=0; j<conformation_points; j++)
+		{
+			vector[j] = malloc(sizeof(double)*dimension);
+			read = getline(&line, &len, dataset);
+			char *tok = strtok(line, "\t");
+			vector[j][0] = atof(tok);
+			tok = strtok(NULL, "\t");
+			vector[j][1] = atof(tok);
+			tok = strtok(NULL, "\t");
+			vector[j][2] = atof(tok);
+		}
+		// Curve Curve_create(char *id, unsigned int points_count, double **points, int curve_idx)
+		char id[10];
+		sprintf(id, "%d", i);
+		conformations[i] = Curve_create(id, conformation_points, vector, i);
+	}
+
+	free(line);
+	line = NULL;
+	fclose(dataset);
+	dataset = NULL;
+
+	return conformations;
 }

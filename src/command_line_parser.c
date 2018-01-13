@@ -11,7 +11,6 @@ Params command_line_parser(int argc, char **argv)
 	int c;
 	Params parameters = malloc(sizeof(struct par));
 	parameters->input_file = NULL;
-	parameters->configuration_file = NULL;
 	parameters->number_of_grid_curves = 2;
 	parameters->number_of_hash_tables = 3;
 	parameters->grid_density = 0.000001;
@@ -27,8 +26,8 @@ Params command_line_parser(int argc, char **argv)
 			/* flags */
 			/* non-flag arguments */
 			{"input_file", required_argument, 0, 'd'},
-			{"configuration_file", required_argument, 0, 'q'},
 			{"output_file", required_argument, 0, 'o'},
+			{"config_file", required_argument, 0, 'c'},
 			{"function", required_argument, 0},
 			{0, 0, 0, 0}
 		};
@@ -57,6 +56,12 @@ Params command_line_parser(int argc, char **argv)
 						parameters->metric_name = optarg;
 						parameters->metric_func = &Frechet_distance;
 					}
+					else if(strncmp(optarg, "CRMSD", 5) ==0 
+							|| strncmp(optarg, "cRMSD", 5) ==0)
+					{
+						parameters->metric_name = optarg;
+						parameters->metric_func = &CRMSD_curve_dist;
+					}
 				}
 				break;
 
@@ -64,7 +69,6 @@ Params command_line_parser(int argc, char **argv)
 				printf ("option -i with value `%s'\n", optarg);
 				parameters->input_file = optarg;
 				break;
-
 			case 'c':
 				printf ("option -c with value `%s'\n", optarg);
 				parameters->configuration_file = optarg;
@@ -81,6 +85,12 @@ Params command_line_parser(int argc, char **argv)
 				{
 					parameters->metric_name = optarg;
 					parameters->metric_func = &Frechet_distance;
+				}
+				else if(strncmp(optarg, "CRMSD", 5) ==0 
+						|| strncmp(optarg, "cRMSD", 5) ==0)
+				{
+					parameters->metric_name = optarg;
+					parameters->metric_func = &CRMSD_curve_dist;
 				}
 				break;
 

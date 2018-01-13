@@ -1,6 +1,8 @@
 #ifndef __FUNCTION_CUSTER__
 #define __FUNCTION_CUSTER__
 #include "global_defs.h"
+#include "command_line_parser.h"
+
 struct fun_cst
 {
 	unsigned int (*object_points)(void *point);
@@ -14,6 +16,6 @@ struct fun_cst
 
 typedef struct fun_cst *FunctionCaster;
 
-FunctionCaster FunctionCaster_init();
+FunctionCaster FunctionCaster_init(Params parameters);
 void FunctionCaster_delete(FunctionCaster function_caster);
 #endif

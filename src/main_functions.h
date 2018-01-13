@@ -20,8 +20,11 @@ List create_curves_list(Curve *curves, unsigned int number_of_curves);
 unsigned int object_points(void *point);
 double point_dist(void *P, void *Q, double ***array);
 void del_point(void *point);
-void run_all_combinations(Params parameters, Curve *curves, List curves_list,
+void execute_clustering(Params parameters, Curve *curves, List curves_list,
 		HashTable *hashes, unsigned int *rand_for_hash, double ***shift_values,
 		double **dists);
-double ** calculate_all_frechet_dists(Curve *curves, unsigned int num_of_curves);
+// void run_all_combinations(Params parameters, Curve *curves, List curves_list,
+		// HashTable *hashes, unsigned int *rand_for_hash, double ***shift_values,
+		// double **dists);
+double ** calculate_all_dists(Curve *curves, unsigned int num_of_curves, double (*dist_func)(Curve, Curve, double ***));
 #endif

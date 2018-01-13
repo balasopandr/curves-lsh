@@ -126,3 +126,25 @@ void array_print(double *array, int row, int col, int major, FILE *stream)
 		fprintf(stream, "]\n");
 	}
 }
+
+void array_addition(double *arr1, double *arr2, int size, int a, int b)
+{
+	for(int i=0; i<size; i++)
+	{
+		arr1[i] = a*arr1[i] + b*arr2[i];
+	}
+}
+
+double * convert_matrix(double **matrix, int rows, int cols)
+{
+	double *array = malloc(sizeof(double)*rows*cols);
+	for(int i=0; i<rows; i++)
+	{
+		for(int j=0; j<cols; j++)
+		{
+			int x = j*rows + i;
+			array[x] = matrix[i][j];
+		}
+	}
+	return array;
+}
