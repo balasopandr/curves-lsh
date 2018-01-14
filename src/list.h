@@ -18,4 +18,5 @@ unsigned int List_get_length(List list);
 Node Node_get_data(Node node);
 Node Node_get_next(Node node);
 List List_copy(List list);
+void Node_set_data(Node node, void *data);
 #endif

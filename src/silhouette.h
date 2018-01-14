@@ -13,4 +13,8 @@ double calculate_silhouette(Cluster *clusters, Params parameters,
 double calculate_average(Cluster cluster, void *point, double **dists,
 	FunctionCaster function_caster);
 
+double calculate_point_silhouette(Cluster *clusters, int i, void *sil_point,
+		Params parameters, double **dists,
+		void (*garbage_collector)(double **, unsigned int size),
+		FunctionCaster function_caster);
 #endif

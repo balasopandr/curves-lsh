@@ -5,3 +5,7 @@ tags
 vgcore*
 datasets/
 *.swp
+*.conf
+.cproject
+.project
+.settings

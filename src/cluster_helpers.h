@@ -21,4 +21,5 @@ int find_second_nearest_cluster(Cluster *clusters, unsigned int num_of_clusters,
 		double *minimum_distance, 
 		void (*garbage_collector)(double **, unsigned int size),
 		FunctionCaster function_caster);
+void destroy_clusters(Cluster *clusters, unsigned int num_of_clusters);
 #endif

@@ -30,17 +30,29 @@ int main(int argc, char **argv)
 	FILE *dataset = open_or_die(parameters->input_file, "r", "Couldn't open input file");
 	unsigned int number_of_conformations;
 	Curve *conformations = read_conformations(dataset, &number_of_conformations);
+	List conformations_list = create_curves_list(conformations, number_of_conformations);
 
-	// double **dists = calculate_all_dists(conformations, number_of_conformations,
-			// parameters->metric_func);
+	/* generate hashes */
+	unsigned int *rand_for_hash = generate_random_ints(Curve_get_points_count(conformations[0])
+			*dimension*parameters->number_of_grid_curves);
+	double ***shift_values = generate_shift_values(parameters);
+	/* build the LSH structure */
+	HashTable *hashes = build_hashes(conformations_list, parameters, rand_for_hash, shift_values,
+			number_of_conformations/parameters->number_of_clusters);
 
-	// double dist = CRMSD_curve_dist(conformations[0], conformations[1], NULL);
-	// printf("I found dist: %f\n", dist);
-	// Curve_print(conformations[0], stdout);
+	 double **dists = calculate_all_dists(conformations, number_of_conformations,
+			 parameters->metric_func);
 
-	free_strings(parameters, delete_input, false, delete_output, delete_metric);
+	execute_clustering(parameters, conformations, conformations_list, hashes, rand_for_hash, shift_values, dists);
+
+	free_hashes(hashes, parameters);
+    free(rand_for_hash);
+    rand_for_hash = NULL;
+    free_shift_values(shift_values, parameters);
+	free_strings(parameters, delete_input, delete_config, delete_output, delete_metric);
 	free_curves(conformations, number_of_conformations, NULL);
 	free_double_array(dists, number_of_conformations);
+	List_destroy(conformations_list, NULL);
 	free(parameters);
 	parameters = NULL;
 	return 0;

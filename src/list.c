@@ -196,3 +196,8 @@ Node Node_get_next(Node node)
 {
 	return node->next;
 }
+
+void Node_set_data(Node node, void *data)
+{
+	node->data = data;
+}

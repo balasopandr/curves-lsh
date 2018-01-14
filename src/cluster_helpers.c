@@ -134,3 +134,14 @@ int find_second_nearest_cluster(Cluster *clusters, unsigned int num_of_clusters,
 	*minimum_distance = min_dist;
 	return second_nearest_cluster;
 }
+
+void destroy_clusters(Cluster *clusters, unsigned int num_of_clusters)
+{
+	for(int i=0; i<num_of_clusters; i++)
+	{
+		Cluster_delete(clusters[i]);
+		clusters[i] = NULL;
+	}
+	free(clusters);
+	clusters = NULL;
+}

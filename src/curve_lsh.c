@@ -10,9 +10,9 @@
 #include "main_functions.h"
 
 extern unsigned int dimension;
-#define ELEMENTS_PER_BUCKET 90
 
-HashTable * build_hashes(List curve_list, Params parameters, unsigned int *rand_for_hash, double ***shift_values)
+HashTable * build_hashes(List curve_list, Params parameters, unsigned int *rand_for_hash, double ***shift_values,
+		unsigned int elementer_per_bucket)
 {
 	/* create L hashtables */
 	HashTable *hashes = malloc(sizeof(HashTable)*parameters->number_of_hash_tables);
@@ -38,7 +38,7 @@ HashTable * build_hashes(List curve_list, Params parameters, unsigned int *rand_
 		}
 
 		/* calculate hash value and insert curves to the hashtable */
-		hashes[hash_count] = HashTable_init(List_get_length(curve_list)/ELEMENTS_PER_BUCKET);
+		hashes[hash_count] = HashTable_init(List_get_length(curve_list)/elementer_per_bucket);
 		Node curcurve = List_get_first_node(curve_list);
 		Node curgridvec = List_get_first_node(vector_list);
 		while(curcurve != NULL)

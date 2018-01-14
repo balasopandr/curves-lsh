@@ -8,7 +8,7 @@ SOURCES:= $(wildcard $(SRC)/*.c)
 
 SRC_OBJECTS=$(SOURCES:.c=.o)
 OBJECTS=$(SRC_OBJECTS:$(SRC)%=$(BIN)%)
-OUT=$(BIN)/cluster
+OUT=$(BIN)/conformations
 
 all: $(OUT)
 

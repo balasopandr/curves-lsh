@@ -180,11 +180,10 @@ Curve* read_conformations(FILE *dataset, unsigned int *number_of_conformations)
 {
 	char *line = NULL;
 	size_t len = 0;
-	ssize_t read;
 
-	read = getline(&line, &len, dataset);
+	getline(&line, &len, dataset);
 	*number_of_conformations = atoi(line);
-	read = getline(&line, &len, dataset);
+	getline(&line, &len, dataset);
 	unsigned int conformation_points = atoi(line);
 
 	Curve *conformations = malloc(sizeof(Curve)*(*number_of_conformations));
@@ -195,7 +194,7 @@ Curve* read_conformations(FILE *dataset, unsigned int *number_of_conformations)
 		for(int j=0; j<conformation_points; j++)
 		{
 			vector[j] = malloc(sizeof(double)*dimension);
-			read = getline(&line, &len, dataset);
+			getline(&line, &len, dataset);
 			char *tok = strtok(line, "\t");
 			vector[j][0] = atof(tok);
 			tok = strtok(NULL, "\t");

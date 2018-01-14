@@ -4,7 +4,7 @@ LDFLAGS=-lm
 BIN:=../bin_tests
 SRC:=../src
 
-METRICS=$(BIN)/curve_metrics_test
+METRICS=$(BIN)/test
 
 SOURCES = curve.c curve_metrics.c data_parser.c helper_functions.c list.c pair_int.c complete_binary_tree.c free_memory.c hash_table.c hash_data.c vector.c cluster.c
 OBJECTS = $(SOURCES:.c=.o)
