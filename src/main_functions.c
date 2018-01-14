@@ -161,7 +161,7 @@ void execute_clustering(Params parameters, Curve *conformations, List curves_lis
 
 	/* print output */
 	print_output(best_clusters, parameters, silhouette_cluster, 
-			silhouette_average);
+			silhouette_average, function_caster);
 	free_clusters(clusters, parameters);
 	free_clusters(best_clusters, parameters);
 	free(silhouette_cluster);
