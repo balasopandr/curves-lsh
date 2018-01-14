@@ -100,7 +100,6 @@ void execute_clustering(Params parameters, Curve *conformations, List curves_lis
 {
 	unsigned int number_of_conformations = List_get_length(curves_list);
 	FunctionCaster function_caster = FunctionCaster_init(parameters);
-	printf("***START LOOP***\n");
 	Cluster *clusters = malloc(sizeof(Cluster)*parameters->number_of_clusters);
 	int m;
 	for(m=0; m<parameters->number_of_clusters; m++)
@@ -140,7 +139,6 @@ void execute_clustering(Params parameters, Curve *conformations, List curves_lis
 		double cur_min_func = minimization_function((void **)conformations, number_of_conformations,
 				clusters, parameters, dists, free_double_array, function_caster);
 		diff = (min_func - cur_min_func);
-		printf("step %d: target: %f diff: %f, min_func: %f\n", count, THRESHOLD, diff, cur_min_func);
 		if(cur_min_func < min_func)
 		{
 			min_func = cur_min_func;
@@ -168,7 +166,6 @@ void execute_clustering(Params parameters, Curve *conformations, List curves_lis
 	free_clusters(best_clusters, parameters);
 	free(silhouette_cluster);
 	silhouette_cluster = NULL;
-	printf("***END LOOP***\n");
 	FunctionCaster_delete(function_caster);
 }
 
@@ -180,10 +177,6 @@ double ** calculate_all_dists(Curve *curves, unsigned int num_of_curves, double 
 	{
 		dists[i] = malloc(sizeof(double)*num_of_curves);
 		int j;
-		if(i%30==0)
-		{
-			printf("-->%d\n",i);
-		}
 		for(j=0; j<i+1; j++)
 		{
 			double **garbage_dists;

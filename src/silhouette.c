@@ -63,11 +63,5 @@ double calculate_point_silhouette(Cluster *clusters, int i, void *sil_point,
 			garbage_collector, function_caster);
 	double beta = calculate_average(clusters[idx], sil_point,
 			dists, function_caster);
-	if((alpha==0 && beta==0) || alpha != alpha || beta != beta)
-	{
-		printf(">>>(%f, %f): %d -- %d\n", alpha, beta,
-				Cluster_get_points_count(clusters[i]),
-				Cluster_get_points_count(clusters[idx]));
-	}
 	 return (beta - alpha)/fmax(alpha, beta);
 }

@@ -11,7 +11,6 @@ void print_output(Cluster *clusters, Params parameters, double *silhouette_clust
 	double variance = 0.0;
 	for(int i=0; i<parameters->number_of_clusters; i++)
 	{
-		printf(">>>>>>>%f\n", silhouette_cluster[i]);
 		variance += SQR(silhouette_cluster[i]);
 	}
 	variance /= parameters->number_of_clusters;
@@ -21,7 +20,6 @@ void print_output(Cluster *clusters, Params parameters, double *silhouette_clust
 			"Couldn't open output file");
 	fprintf(output, "k: %d\n", parameters->number_of_clusters);
 	fprintf(output, "s: %f\n", silhouette_average);
-	fprintf(output, "var: %f\n", variance);
 
 	for(int m=0; m<parameters->number_of_clusters; m++)
 	{
