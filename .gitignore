@@ -9,3 +9,6 @@ datasets/
 .cproject
 .project
 .settings
+run_test.sh
+*.ods
+.*lock

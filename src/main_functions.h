@@ -23,8 +23,5 @@ void del_point(void *point);
 void execute_clustering(Params parameters, Curve *curves, List curves_list,
 		HashTable *hashes, unsigned int *rand_for_hash, double ***shift_values,
 		double **dists);
-// void run_all_combinations(Params parameters, Curve *curves, List curves_list,
-		// HashTable *hashes, unsigned int *rand_for_hash, double ***shift_values,
-		// double **dists);
 double ** calculate_all_dists(Curve *curves, unsigned int num_of_curves, double (*dist_func)(Curve, Curve, double ***));
 #endif

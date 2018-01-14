@@ -202,7 +202,6 @@ Curve* read_conformations(FILE *dataset, unsigned int *number_of_conformations)
 			tok = strtok(NULL, "\t");
 			vector[j][2] = atof(tok);
 		}
-		// Curve Curve_create(char *id, unsigned int points_count, double **points, int curve_idx)
 		char id[10];
 		sprintf(id, "%d", i);
 		conformations[i] = Curve_create(id, conformation_points, vector, i);

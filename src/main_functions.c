@@ -135,8 +135,6 @@ void execute_clustering(Params parameters, Curve *conformations, List curves_lis
 		 &free_double_array, function_caster);
 
 		/* Update */
-		// MeanUpdate(clusters, parameters->number_of_clusters, function_caster->del_mean_curve, dists); 
-
 		PAMUpdate(&clusters, parameters, (void **) conformations, number_of_conformations, dists, &free_double_array, function_caster);
 
 		double cur_min_func = minimization_function((void **)conformations, number_of_conformations,

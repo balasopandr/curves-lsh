@@ -87,7 +87,6 @@ Cluster Cluster_copy(Cluster cluster, void * (*copy_medoid)(void *))
 	List_destroy(new_cluster->points, NULL);
 	new_cluster->medoid_idx = cluster->medoid_idx;
 	new_cluster->medoid = cluster->medoid;
-//	new_cluster->medoid = copy_medoid(cluster->medoid);
 	new_cluster->points = List_copy(cluster->points);
 	return new_cluster;
 }
