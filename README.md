@@ -2,6 +2,11 @@
 
 This is a naive implementation of the paper [Locality-sensitive hashing of curves](https://arxiv.org/pdf/1703.04040.pdf) which explores data structures for storing a set of polygonal curves such that given a query curve, we can efficiently retrieve "similar" curves from the set. 
 
+## Requirements:
+* lapack
+* lapacke
+* openblas
+
 ## Compilation:
 * make
 * make src (source files only)
