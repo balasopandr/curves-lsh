@@ -1,16 +1,12 @@
-# Ανάπτυξη Λογισμικού για Αλγοριθμικά Προβλήματα - Εργασία 3
-## Ανδρέας Μπαλασόπουλος
-## ΑΜ: 1115201400115
+# Locality-sensitive hashing of curves
 
-- Έχει υλοποιηθεί το μόνο πρώτο κομμάτι της άσκησης (Συσταδοποίηση μοριακών διαμορφώσεων)
+This is a naive implementation of the paper [Locality-sensitive hashing of curves](https://arxiv.org/pdf/1703.04040.pdf) which explores data structures for storing a set of polygonal curves such that given a query curve, we can efficiently retrieve "similar" curves from the set. 
 
-## Μεταγλώττιση:
-* make src (για μεταγλώττιση του προγράμματος)
-* make tests (για μεταγλώττιση των unit tests)
-* make (για μεταγλώττιση και src και tests)
+## Compilation:
+* make
+* make src (source files only)
+* make tests (tests only)
 
-## Εκτέλεση:
+## Execution:
 * ./bin/conformations -i "dataset path" -o "output file path" -c "cluster configuration file" -d "distance metric: {DFT, cRMSD}"
 * ./bin_tests/test
-
-- Το πρόγραμμα έτρεξε για διαφορετικό αριθμό clusters και από τα αποτελέσματα επιλέχθηκε ο αριθμός k=29 γιατί δίνει τον καλύτερο συμβιβασμό μεταξύ της απόκλισης στη silhouette των clusters σε σχέση με τη μέση τιμή. Αυτό φαίνεται και σχηματικά στο διάγραμμα που επισυνάπτεται [results.png]
